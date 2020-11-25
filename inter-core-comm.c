@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <signal.h>
+#include <dirent.h>
 
 #include "inter-core-comm.h"
 
@@ -22,9 +23,71 @@ int blocks[ICC_CORE_BLOCK_COUNT];
 unsigned int block_idx;
 void *g_icc_irq_cb[CONFIG_MAX_CPUS] = {NULL};
 int fd;
+int g_gicv3_flag = 0;
 
 #define block2index(x) ((x - ICC_CORE_BLOCK_BASE_PHY(mycoreid)) / ICC_BLOCK_UNIT_SIZE)
 #define index2block(x) (ICC_CORE_BLOCK_BASE_PHY(mycoreid) + (x * ICC_BLOCK_UNIT_SIZE))
+
+
+int search_in_file(char *fname, char *str) {
+	FILE *fp;
+	char temp[128];
+
+	if((fp = fopen(fname, "r")) == NULL) {
+		return(-1);
+	}
+
+	while(fgets(temp, 128, fp) != NULL) {
+		if((strstr(temp, str)) != NULL) {
+			printf("\n matched: %s\n", temp);
+			fclose(fp);
+			return 0;
+		}
+	}
+
+	fclose(fp);
+	return (1);
+}
+
+int find_gicv3_indir(char * path)
+{
+    int ret;
+  DIR * d = opendir(path);
+  if( d == NULL )
+      return -1;
+  /* for the directory entries */
+  struct dirent * dir;
+  while ((dir = readdir(d)) != NULL)
+  {
+      if(dir-> d_type != DT_DIR)
+      {
+		char abspath[256] = {0};
+		sprintf(abspath, "%s/%s", path, dir->d_name);
+		ret = search_in_file(abspath,"arm,gic-v3");
+		if(ret == 0)
+		{
+			closedir(d);
+			return 0;
+		}
+
+      }
+      else if(dir -> d_type == DT_DIR &&    \
+		      strcmp(dir->d_name,".")!=0 &&  \
+		      strcmp(dir->d_name,"..")!=0 )
+      {
+        char d_path[255];
+        sprintf(d_path, "%s/%s", path, dir->d_name);
+        ret = find_gicv3_indir(d_path);
+        if(ret == 0)
+        {
+		closedir(d);
+		return 0;
+        }
+      }
+    }
+    closedir(d);
+    return 1;
+}
 
 static int icc_ring_empty(struct icc_ring *ring)
 {
@@ -135,18 +198,13 @@ void icc_block_free(unsigned long block)
 void icc_set_sgi(int core_mask, unsigned int hw_irq)
 {
 	unsigned long val;
-	char hostname[32];
 
 	if(hw_irq > 15) {
 		printf ("Interrupt id num: %lu is not valid, SGI[0 - 15]\n", hw_irq);
 		return;
 	}
 
-	if (gethostname(hostname,sizeof(hostname))) {
-		printf ("gethostname error");
-		return;
-	}
-	if (strstr(hostname, "LS1028A") || strstr(hostname, "LX2160A")) { /* Check the LS1028A and LX2160A board */
+	if(g_gicv3_flag){
 		val = core_mask | hw_irq << 24;
 		if (ioctl(shd_memfd, 1, &val))
 			printf("Triger Interrupt failed\n");
@@ -231,7 +289,6 @@ static void icc_ring_init(int coreid)
 
 	for (i = 0; i < CONFIG_MAX_CPUS; i++) {
 		ring[i] = (struct icc_ring *)ICC_CORE_RING_BASE(coreid, i);
-
 		ring[i]->src_coreid = coreid;
 		ring[i]->dest_coreid = i;
 		ring[i]->interrupt = ICC_SGI;
@@ -348,6 +405,9 @@ int icc_init(void)
 		printf("Core%d check resource failed! %d\n", mycoreid, ret);
 		return ret;
 	}
+	ret = find_gicv3_indir("/sys/firmware/devicetree/base");
+	if(!ret)
+		g_gicv3_flag = 1;
 
 	icc_ring_init(mycoreid);
 
