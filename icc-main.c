@@ -239,8 +239,8 @@ static int do_icc_send(int argc, char * const argv[])
 			continue;
 		} else {
 			memset((void *)ICC_PHY2VIRT(block), data,
-				bytes / 8 * 8);
-			for (int i = bytes / 8 * 8; i < bytes; i++)
+				bytes / 16 * 16);
+			for (int i = bytes / 16 * 16; i < bytes; i++)
 				*((char *)ICC_PHY2VIRT(block) + i) = data;
 			ret = icc_set_block(dest_core, bytes, block);
 			if (ret) {
