@@ -108,8 +108,11 @@ int shd_memfd;
  * 0-7 are used by Linux SMP, the number 8
  * is used by IPIPE.
  */
-
+#ifdef CONFIG_ICC_IMX8M
 #define ICC_SGI 9
+#else
+#define ICC_SGI 8
+#endif
 #define DEVICE_BM     "/dev/ipi_bm"
 #define SIG_BM 50
 
