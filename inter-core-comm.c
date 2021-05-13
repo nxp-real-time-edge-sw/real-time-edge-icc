@@ -18,6 +18,11 @@
 
 #include "inter-core-comm.h"
 
+int mycoreid;
+void *gic_base;
+void *share_base;
+int shd_memfd;
+
 struct icc_ring *ring[CONFIG_MAX_CPUS];
 int blocks[ICC_CORE_BLOCK_COUNT];
 unsigned int block_idx;

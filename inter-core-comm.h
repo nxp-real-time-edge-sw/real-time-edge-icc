@@ -21,10 +21,10 @@
 #define GIC_DIST_SOFTINT	0xf00
 #define IPIDEV_IOCIRQ	1
 
-int mycoreid;
-void *gic_base;
-void *share_base;
-int shd_memfd;
+extern int mycoreid;
+extern void *gic_base;
+extern void *share_base;
+extern int shd_memfd;
 
 
 #ifdef CONFIG_ICC_MAX_CPUS
