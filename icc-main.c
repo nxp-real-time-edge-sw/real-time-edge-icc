@@ -67,7 +67,7 @@ static void do_icc_receive(void)
 
 static int do_icc_perf(int argc, char * const argv[])
 {
-	unsigned long core_mask, dest_core;
+	unsigned long core_mask, dest_core = 0;
 	unsigned long block;
 	char *endp;
 	unsigned long long counts, bytes;
@@ -310,6 +310,8 @@ static int do_icc_read_register(int argc, char * const argv[])
 	for (i = 0; i < counts; i++)
 		printf("0x%08lx: 0x%08x\n", phy_addr + i * 4,
 			*((volatile unsigned int *)((void *)ptr + offset + i * 4)));
+
+	munmap(ptr, GICD_SIZE);
 exit:
 	return 0;
 }
@@ -348,6 +350,8 @@ static int do_icc_write_register(int argc, char * const argv[])
 	*((volatile unsigned int *)((void *)ptr + offset)) = data;
 	printf("The ptr from mmap: %p, offset: 0x%x, data: 0x%x, readback: 0x%x\n",
 		ptr, offset, data, *((volatile unsigned int *)((void *)ptr + offset)));
+
+	munmap(ptr, GICD_SIZE);
 exit:
 	return 0;
 }

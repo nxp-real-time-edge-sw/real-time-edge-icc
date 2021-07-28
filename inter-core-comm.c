@@ -365,6 +365,8 @@ int icc_irq_register(int src_coreid, void (*irq_handle)(int, unsigned long, unsi
 	char buf[10];
 	struct sigaction sig;
 
+	memset(&sig, 0, sizeof(struct sigaction));
+
 	if ((src_coreid > CONFIG_MAX_CPUS) || (src_coreid == mycoreid))
 		return -1;
 	else if (src_coreid == CONFIG_MAX_CPUS) {
