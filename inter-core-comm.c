@@ -96,6 +96,7 @@ int find_gicv3_indir(char * path)
 
 static int icc_ring_empty(struct icc_ring *ring)
 {
+	printf("HCM -tail: %d, head: %d\n", ring->desc_tail, ring->desc_head);
 	if (ring->desc_tail == ring->desc_head)
 		return 1;
 	return 0;
@@ -205,7 +206,7 @@ void icc_set_sgi(int core_mask, unsigned int hw_irq)
 	unsigned long val;
 
 	if(hw_irq > 15) {
-		printf ("Interrupt id num: %lu is not valid, SGI[0 - 15]\n", hw_irq);
+		printf ("Interrupt id num: %u is not valid, SGI[0 - 15]\n", hw_irq);
 		return;
 	}
 

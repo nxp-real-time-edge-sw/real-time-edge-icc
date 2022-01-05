@@ -105,7 +105,7 @@ static int do_icc_perf(int argc, char * const argv[])
 	memset((void *)ICC_CORE_BLOCK_BASE(mycoreid), 0x5a, (ICC_CORE_MEM_SPACE - ICC_RING_DESC_SPACE));
 
 	printf("ICC performance testing ...\n");
-	printf("Target cores: 0x%x, bytes: %ld, ", dest_core, counts);
+	printf("Target cores: 0x%lx, bytes: %ld, ", dest_core, counts);
 
 	clock_gettime(CLOCK_REALTIME, &time_start);
 	while (bytes >= ICC_BLOCK_UNIT_SIZE) {
@@ -161,7 +161,7 @@ static int do_icc_perf(int argc, char * const argv[])
 	clock_gettime(CLOCK_REALTIME, &time_end);
 	nstime = time_end.tv_nsec-time_start.tv_nsec;
 
-	printf("ICC performance: %lld bytes to 0x%x cores in %lld us with %lld KB/s\n",
+	printf("ICC performance: %lld bytes to 0x%lx cores in %lld us with %lld KB/s\n",
 		counts, dest_core, nstime/1000, (counts * 1000000)/nstime);
 
 	printf("\n");
@@ -210,7 +210,7 @@ static int do_icc_send(int argc, char * const argv[])
 	bytes = counts;
 
 	printf("ICC send testing ...\n");
-	printf("Target cores: 0x%x, bytes: %ld\n", dest_core, counts);
+	printf("Target cores: 0x%lx, bytes: %ld\n", dest_core, counts);
 
 	while (bytes >= ICC_BLOCK_UNIT_SIZE) {
 		block = icc_block_request();
@@ -265,7 +265,7 @@ static int do_icc_send(int argc, char * const argv[])
 			break;
 	}
 
-	printf("ICC send: %ld bytes to 0x%x cores success\n",
+	printf("ICC send: %ld bytes to 0x%lx cores success\n",
 		counts, dest_core);
 
 	printf("\n");
@@ -291,7 +291,7 @@ static int do_icc_read_register(int argc, char * const argv[])
 
 	counts = (unsigned int)strtoul(argv[3], &endp, 0);
 	if ((*endp != 0) || (!counts)) {
-		printf ("Counts: %lu is not valid\n", counts);
+		printf ("Counts: %u is not valid\n", counts);
 		return -1;
 	};
 
@@ -332,7 +332,7 @@ static int do_icc_write_register(int argc, char * const argv[])
 
 	data = (unsigned int)strtoul(argv[3], &endp, 0);
 	if (*endp != 0) {
-		printf ("data: %lu is not valid\n", data);
+		printf ("data: %u is not valid\n", data);
 		return -1;
 	};
 
@@ -363,13 +363,13 @@ static int do_icc_irq_cores(int argc, char * const argv[])
 
 	core_mask = strtoul(argv[2], &endp, 0);
 	if ((*endp != 0) && (core_mask > 0xf)) {
-		printf ("core_mask: %lu is not valid\n", core_mask);
+		printf ("core_mask: %u is not valid\n", core_mask);
 		return -1;
 	};
 
 	hw_irq = strtoul(argv[3], &endp, 0);
 	if ((*endp != 0) && (hw_irq > 15)) {
-		printf ("Interrupt id num: %lu is not valid, SGI[0 - 15]\n", hw_irq);
+		printf ("Interrupt id num: %u is not valid, SGI[0 - 15]\n", hw_irq);
 		return -1;
 	};
 
@@ -397,7 +397,7 @@ int main(int argc, char **argv)
 
 	if (shd_memfd < 0) {
 		fprintf(stderr, "Couldn't open file %s\n", SHD_MEMDEVICE);
-		goto exit;
+		goto exit1;
 	}
 
 	/* map GIC physical memory space into process memory space */
@@ -419,7 +419,7 @@ int main(int argc, char **argv)
 		goto exit;
 	}
 
-	printf("gic_base: %p, share_base: %p, share_phy: 0x%x, block_phy: 0x%x\n",
+	printf("gic_base: %p, share_base: %p, share_phy: 0x%lx, block_phy: 0x%lx\n",
 		gic_base, share_base,
 		ICC_CORE_MEM_BASE_PHY(mycoreid),
 		ICC_CORE_BLOCK_BASE_PHY(mycoreid));
@@ -466,8 +466,10 @@ int main(int argc, char **argv)
 	printf("\n");
 
 	usage(argv[0]);
-exit:
-	close(memfd);
+
 	close(shd_memfd);
+exit1:
+	close(memfd);
+exit:
 	return 0;
 }
