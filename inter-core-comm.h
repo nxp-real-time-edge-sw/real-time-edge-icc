@@ -164,7 +164,7 @@ void icc_block_free(unsigned long block);
  *		NOTE: cannot send SGI to self-core
  * hw_irq: SGI interrupt, must be [0 - 15].
  */
-void icc_set_sgi(int core_mask, unsigned int hw_irq);
+void icc_set_sgi(unsigned int core_mask, unsigned int hw_irq);
 
 /*
  * Register icc callback handler.
