@@ -203,7 +203,7 @@ void icc_block_free(unsigned long block)
 
 void icc_set_sgi(unsigned int core_mask, unsigned int hw_irq)
 {
-	unsigned long val;
+	unsigned int val;
 
 	if(hw_irq > 15) {
 		printf ("Interrupt id num: %u is not valid, SGI[0 - 15]\n", hw_irq);
