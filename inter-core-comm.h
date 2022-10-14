@@ -34,20 +34,20 @@ extern int shd_memfd;
 #endif
 #ifdef CONFIG_ICC_GIC_IMX6Q
 #define CONFIG_SYS_DDR_SDRAM_BASE       0x10000000UL
-#define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (128 * 1024 * 1024)
-#define CONFIG_SYS_DDR_SDRAM_MASTER_SIZE       (512 * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (128UL * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_MASTER_SIZE       (512UL * 1024 * 1024)
 #elif  defined (CONFIG_ICC_LX2160A)
 #define CONFIG_SYS_DDR_SDRAM_BASE       0x80000000UL
 #define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (64UL * 1024 * 1024)
 #define CONFIG_SYS_DDR_SDRAM_MASTER_SIZE       (512UL * 1024 * 1024)
 #elif  defined (CONFIG_ICC_IMX8M)
 #define CONFIG_SYS_DDR_SDRAM_BASE       0x60000000UL
-#define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (32 * 1024 * 1024)
-#define CONFIG_SYS_DDR_SDRAM_SLAVE_RESERVE_SIZE (32 * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (32UL * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_SLAVE_RESERVE_SIZE (32UL * 1024 * 1024)
 #else
 #define CONFIG_SYS_DDR_SDRAM_BASE       0x80000000UL
-#define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (256 * 1024 * 1024)
-#define CONFIG_SYS_DDR_SDRAM_MASTER_SIZE       (512 * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (256UL * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_MASTER_SIZE       (512UL * 1024 * 1024)
 #endif
 
 #define CONFIG_MASTER_CORE                     0
@@ -56,17 +56,17 @@ extern int shd_memfd;
 #define CONFIG_SYS_DDR_SDRAM_SHARE_BASE \
 	(CONFIG_SYS_DDR_SDRAM_BASE  \
 	+ CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE * (CONFIG_MAX_CPUS - 1))
-#define CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE (4 * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE (4UL * 1024 * 1024)
 #else
 #define CONFIG_SYS_DDR_SDRAM_SHARE_BASE \
        (CONFIG_SYS_DDR_SDRAM_BASE + CONFIG_SYS_DDR_SDRAM_MASTER_SIZE \
        + CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE * (CONFIG_MAX_CPUS - 1))
-#define CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE (16 * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE (16UL * 1024 * 1024)
 #endif
 
 #ifdef CONFIG_ICC_GIC_IMX6Q
 #define CONFIG_SYS_DDR_SDRAM_SHARE_SIZE \
-	((128 * 1024 * 1024) - CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE)
+	((128UL * 1024 * 1024) - CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE)
 #elif  defined (CONFIG_ICC_LX2160A)
 #define CONFIG_SYS_DDR_SDRAM_SHARE_SIZE \
 	((64UL * 1024 * 1024) - CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE)
@@ -75,15 +75,15 @@ extern int shd_memfd;
 	(CONFIG_SYS_DDR_SDRAM_SLAVE_RESERVE_SIZE - CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE)
 #else
 #define CONFIG_SYS_DDR_SDRAM_SHARE_SIZE \
-	((256 * 1024 * 1024) - CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE)
+	((256UL * 1024 * 1024) - CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE)
 
 #endif
 #define CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_BASE \
 	(CONFIG_SYS_DDR_SDRAM_SHARE_BASE + CONFIG_SYS_DDR_SDRAM_SHARE_SIZE)
 
 #define ICC_RING_ENTRY 128	/* number of descriptor for each ring */
-#define ICC_BLOCK_UNIT_SIZE (4 * 1024)	/* size of each block */
-#define ICC_RING_DESC_SPACE (2 * 1024 * 1024) /* 2M space for core's ring and desc struct */
+#define ICC_BLOCK_UNIT_SIZE (4UL * 1024)	/* size of each block */
+#define ICC_RING_DESC_SPACE (2UL * 1024 * 1024) /* 2M space for core's ring and desc struct */
 
 #define ICC_CORE_MEM_SPACE (CONFIG_SYS_DDR_SDRAM_SHARE_SIZE / CONFIG_MAX_CPUS) /* share memory size for each core icc */
 #define ICC_CORE_MEM_BASE_PHY(x) (CONFIG_SYS_DDR_SDRAM_SHARE_BASE + (x) * ICC_CORE_MEM_SPACE) /* share memory base for core x */
@@ -164,7 +164,7 @@ void icc_block_free(unsigned long block);
  *		NOTE: cannot send SGI to self-core
  * hw_irq: SGI interrupt, must be [0 - 15].
  */
-void icc_set_sgi(int core_mask, unsigned int hw_irq);
+void icc_set_sgi(unsigned int core_mask, unsigned int hw_irq);
 
 /*
  * Register icc callback handler.
