@@ -202,7 +202,7 @@ static int do_icc_send(int argc, char * const argv[])
 	}
 
 	if (counts > ICC_CORE_BLOCK_COUNT * ICC_BLOCK_UNIT_SIZE) {
-		printf("ICC send error! Max bytes: %d, input bytes: %ld",
+		printf("ICC send error! Max bytes: %lu, input bytes: %ld",
 			ICC_CORE_BLOCK_COUNT * ICC_BLOCK_UNIT_SIZE, counts);
 		return -1;
 	}
