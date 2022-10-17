@@ -243,7 +243,7 @@ int icc_set_block(int core_mask, unsigned int byte_count, unsigned long block)
 		return -1;
 
 	if (byte_count > ICC_BLOCK_UNIT_SIZE) {
-		printf("Set block failed! core_mask: 0x%x, byte_count: %d, max byte: %d\n",
+		printf("Set block failed! core_mask: 0x%x, byte_count: %d, max byte: %lu\n",
 			core_mask, byte_count, ICC_BLOCK_UNIT_SIZE);
 		return -1;
 	}
@@ -280,7 +280,7 @@ static int icc_check_resource(int coreid)
 	if ((ICC_RING_ENTRY * CONFIG_MAX_CPUS * sizeof(struct icc_desc)
 	    + CONFIG_MAX_CPUS * sizeof(struct icc_ring))
 	    > ICC_RING_DESC_SPACE) {
-		printf("The memory size %d is not enough for core%d %d rings and %d desc\n",
+		printf("The memory size %lu is not enough for core%d %d rings and %d desc\n",
 			ICC_RING_DESC_SPACE, coreid, CONFIG_MAX_CPUS,
 			CONFIG_MAX_CPUS * ICC_RING_ENTRY);
 		return -1;
@@ -432,7 +432,7 @@ void icc_show(void)
 	printf("\n");
 	printf("mycoreid: %d; ICC_SGI: %d; share_memory_size: %d\n",
 		mycoreid, ICC_SGI, ICC_CORE_MEM_SPACE);
-	printf("block_unit_size: %d; block number: %d; block_idx: %d\n",
+	printf("block_unit_size: %d; block number: %d; block_idx: %lu\n",
 		ICC_BLOCK_UNIT_SIZE, ICC_CORE_BLOCK_COUNT, block_idx);
 
 	for (i = 0; i < CONFIG_MAX_CPUS; i++) {
