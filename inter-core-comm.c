@@ -432,7 +432,7 @@ void icc_show(void)
 	printf("\n");
 	printf("mycoreid: %d; ICC_SGI: %d; share_memory_size: %d\n",
 		mycoreid, ICC_SGI, ICC_CORE_MEM_SPACE);
-	printf("block_unit_size: %d; block number: %d; block_idx: %lu\n",
+	printf("block_unit_size: %lu; block number: %lu; block_idx: %d\n",
 		ICC_BLOCK_UNIT_SIZE, ICC_CORE_BLOCK_COUNT, block_idx);
 
 	for (i = 0; i < CONFIG_MAX_CPUS; i++) {
