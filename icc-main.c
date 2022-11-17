@@ -74,7 +74,7 @@ static int do_icc_perf(int argc, char * const argv[])
 	unsigned long data;
 	struct timespec time_start={0},time_end={0};
 	unsigned long long nstime;
-	int i, k, ret;
+	int i, k, ret, check_cnt;
 
 	core_mask = strtoul(argv[2], &endp, 16);
 	if ((*endp != 0) || (!core_mask)) {
@@ -146,6 +146,7 @@ static int do_icc_perf(int argc, char * const argv[])
 		bytes = 0;
 	}
 
+	check_cnt = 0;
 	while (1) {
 		k = 0;
 		for (i = 0; i < CONFIG_MAX_CPUS; i++) {
@@ -156,13 +157,22 @@ static int do_icc_perf(int argc, char * const argv[])
 		}
 		if (!k)
 			break;
+		if (check_cnt == 1000)
+			break;
+		if (check_cnt%50 == 0)
+			icc_set_sgi(dest_core, ICC_SGI);
+		check_cnt++;
 	}
 
 	clock_gettime(CLOCK_REALTIME, &time_end);
 	nstime = time_end.tv_nsec-time_start.tv_nsec;
 
-	printf("ICC performance: %lld bytes to 0x%lx cores in %lld us with %lld KB/s\n",
-		counts, dest_core, nstime/1000, (counts * 1000000)/nstime);
+	if (!k) {
+		printf("ICC performance: %lld bytes to 0x%lx cores in %lld us with %lld KB/s\n",
+			counts, dest_core, nstime/1000, (counts * 1000000)/nstime);
+	} else {
+		printf("ICC performance process failed after %lld us\n", nstime/1000);
+	}
 
 	printf("\n");
 	icc_show();
@@ -176,7 +186,7 @@ static int do_icc_send(int argc, char * const argv[])
 	unsigned long counts, bytes;
 	unsigned long data;
 	char *endp;
-	int i, k, ret;
+	int i, k, ret, check_cnt;
 
 	core_mask = strtoul(argv[2], &endp, 16);
 	if ((*endp != 0) || (!core_mask)) {
@@ -253,6 +263,7 @@ static int do_icc_send(int argc, char * const argv[])
 		bytes = 0;
 	}
 
+	check_cnt = 0;
 	while (1) {
 		k = 0;
 		for (i = 0; i < CONFIG_MAX_CPUS; i++) {
@@ -263,10 +274,20 @@ static int do_icc_send(int argc, char * const argv[])
 		}
 		if (!k)
 			break;
+		if (check_cnt == 1000)
+			break;
+		if (check_cnt%50 == 0)
+			icc_set_sgi(dest_core, ICC_SGI);
+		check_cnt++;
 	}
 
-	printf("ICC send: %ld bytes to 0x%lx cores success\n",
-		counts, dest_core);
+	if (!k) {
+		printf("ICC send: %ld bytes to 0x%lx cores success\n",
+			counts, dest_core);
+	} else {
+		printf("ICC send: %ld bytes to 0x%lx cores failed\n",
+			counts, dest_core);
+	}
 
 	printf("\n");
 	icc_show();
