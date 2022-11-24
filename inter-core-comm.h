@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 NXP
+ * Copyright 2018-2022 NXP
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -103,7 +103,7 @@ extern int shd_memfd;
 
 #define ICC_PHY2VIRT(x) (((void *)x - ICC_CORE_MEM_BASE_PHY(mycoreid)) + ICC_CORE_MEM_BASE(mycoreid))
 #define ICC_VIRT2PHY(x) (((void *)x - ICC_CORE_MEM_BASE(mycoreid)) + ICC_CORE_MEM_BASE_PHY(mycoreid))
-/* 
+/*
  * ICC uses the number 8 SGI interrupt.
  * 0-7 are used by Linux SMP, the number 8
  * is used by IPIPE.
@@ -116,9 +116,15 @@ extern int shd_memfd;
 #define DEVICE_BM     "/dev/ipi_bm"
 #define SIG_BM 50
 
+#define ICC_CMD_TX_DATA         0x00
+
+#define ICC_IRQ_IDLE	0x00
+#define ICC_IRQ_BUSY	0x01
+
 struct icc_desc {
 	unsigned long block_addr;	/* block address */
 	unsigned int byte_count;	/* available bytes in the block */
+	unsigned int option_mode;       /* option mode for this icc irq */
 };
 
 struct icc_ring {
@@ -131,6 +137,7 @@ struct icc_ring {
 	unsigned int desc_tail;		/* desc should be handled, modified by consumer */
 	unsigned long busy_counts;	/* statistic: add failed counts, ring full */
 	unsigned long interrupt_counts; /* statistic: total interrupt number triggered */
+	unsigned int irq_status;	/* status of the ring irq, updated by consumer */
 };
 
 /*
@@ -141,15 +148,23 @@ struct icc_ring {
 unsigned long icc_ring_state(int coreid);
 
 /*
+ * get ring's irq status of the target core.
+ * return:
+ * 	ICC_IRQ_IDLE - idle
+ *	ICC_IRQ_BUSY - busy
+ */
+unsigned int icc_ring_irq_status(int coreid);
+
+/*
  * Request a block which is ICC_BLOCK_UNIT_SIZE size.
- * 
+ *
  * return 0:failed, !0:block address can be used
  */
 unsigned long icc_block_request(void);
 
 /*
  * Free a block requested.
- * 
+ *
  * Be careful if the destination cores are working on
  * this block.
  */
@@ -177,7 +192,7 @@ void icc_set_sgi(unsigned int core_mask, unsigned int hw_irq);
  *	  Core 2 also can register only one handler
  *	  for all other 3 cores with src_coreid value
  *	  4.
- * 
+ *
  * int src_coreid: which core the icc coming from for the irq_handle
  *			- CONFIG_MAX_CPUS: the irq_handle for all cores
  *			  except self-core.
@@ -192,10 +207,10 @@ void icc_set_sgi(unsigned int core_mask, unsigned int hw_irq);
  */
 int icc_irq_register(int src_coreid, void (*irq_handle)(int, unsigned long, unsigned int));
 int icc_irq_release(void);
-/* 
+/*
  * Send the data in the block to a core or multi-core.
  * This will trigger the SGI interrupt
- * 
+ *
  * int core_mask: 0x110 including core 1, core 2, not including core 0, core 3
  * int byte_count: how many bytes are available in the block
  * void *block: The address of block

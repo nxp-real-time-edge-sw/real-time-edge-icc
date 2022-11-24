@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 NXP
+ * Copyright 2018-2022 NXP
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -158,6 +158,17 @@ unsigned long icc_ring_state(int coreid)
 	return desc[tail].block_addr;
 }
 
+/*
+ * get ring's irq status of the target core.
+ * return:
+ * 	ICC_IRQ_IDLE
+ * 	ICC_IRQ_BUSY
+ */
+unsigned int icc_ring_irq_status(int coreid)
+{
+	return ring[coreid]->irq_status;
+}
+
 unsigned long icc_block_request(void)
 {
 	unsigned int idx = block_idx;
@@ -190,7 +201,7 @@ unsigned long icc_block_request(void)
 		}
 	}
 	blocks[block_idx] = CONFIG_MAX_CPUS;
-	return index2block(block_idx); 
+	return index2block(block_idx);
 }
 
 void icc_block_free(unsigned long block)
@@ -263,8 +274,10 @@ int icc_set_block(int core_mask, unsigned int byte_count, unsigned long block)
 			}
 			desc->block_addr = block;
 			desc->byte_count = byte_count;
+			desc->option_mode = ICC_CMD_TX_DATA;
 			ring[i]->desc_head = (ring[i]->desc_head + 1) % ring[i]->desc_num;
 			ring[i]->interrupt_counts++;
+			ring[i]->irq_status = ICC_IRQ_IDLE;
 		}
 	}
 
@@ -341,6 +354,7 @@ static void icc_irq_handler(int n, siginfo_t *info, void *unused)
 
 	/* get the ring for this core from source core */
 	ring = (struct icc_ring *)ICC_CORE_RING_BASE(src_coreid, mycoreid);
+	ring->irq_status = ICC_IRQ_BUSY;
 	valid = icc_ring_valid(ring);
 	for (i = 0; i < valid; i++) {
 		desc_phy = ring->desc + ring->desc_tail;
@@ -358,6 +372,8 @@ static void icc_irq_handler(int n, siginfo_t *info, void *unused)
 		/* add desc_tail */
 		ring->desc_tail = (ring->desc_tail + 1) % ring->desc_num;
 	}
+
+	ring->irq_status = ICC_IRQ_IDLE;
 }
 
 int icc_irq_register(int src_coreid, void (*irq_handle)(int, unsigned long, unsigned int))
