@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 NXP
+ * Copyright 2018-2023 NXP
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -116,7 +116,8 @@ extern int shd_memfd;
 #define DEVICE_BM     "/dev/ipi_bm"
 #define SIG_BM 50
 
-#define ICC_CMD_TX_DATA         0x00
+#define ICC_CMD_TX_DATA			0x00
+#define ICC_CMD_DUMP_TIME		0x01
 
 #define ICC_IRQ_IDLE	0x00
 #define ICC_IRQ_BUSY	0x01
@@ -223,4 +224,6 @@ int icc_set_block(int core_mask, unsigned int byte_count, unsigned long block);
 void icc_show(void);
 
 int icc_init(void);
+
+int icc_dump_time(int dest_core);
 #endif /* _ARM_INTER_CORE_COMM_H */

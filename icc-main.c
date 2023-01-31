@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 NXP
+ * Copyright 2018-2023 NXP
  *
  * Description:
  * Inter-core communication with baremetal cores
@@ -379,7 +379,11 @@ static int do_icc_irq_cores(int argc, char * const argv[])
 		return -1;
 	};
 
-	icc_set_sgi(core_mask, hw_irq);
+	if (hw_irq == ICC_SGI) {
+		icc_dump_time(core_mask);
+	} else {
+		icc_set_sgi(core_mask, hw_irq);
+	}
 
 	return 0;
 }

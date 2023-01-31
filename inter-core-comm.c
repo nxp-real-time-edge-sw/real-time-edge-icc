@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 NXP
+ * Copyright 2018-2023 NXP
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -460,4 +460,42 @@ void icc_show(void)
 		printf("busy_counts: %ld; interrupt_counts: %ld\n",
 			ring[i]->busy_counts, ring[i]->interrupt_counts);
 	}
+}
+
+int icc_dump_time(int dest_core)
+{
+    struct icc_desc *desc = NULL;
+	struct icc_desc *desc_phy = NULL;
+    int full = 0;
+    int i;
+
+    if (!dest_core)
+        return -1;
+
+    for (i = 0; i < CONFIG_MAX_CPUS; i++) {
+        if ((dest_core >> i) & 0x1) {
+
+            if (icc_ring_full(ring[i])) {
+                ring[i]->busy_counts++;
+                full = 1;
+                break;
+            }
+
+			desc_phy = ring[i]->desc + ring[i]->desc_head;
+			desc = ICC_PHY2VIRT(desc_phy);
+            desc->block_addr = 0;
+            desc->byte_count = 0;
+            desc->option_mode = ICC_CMD_DUMP_TIME;
+            ring[i]->desc_head = (ring[i]->desc_head + 1) %
+                ring[i]->desc_num;
+            ring[i]->interrupt_counts++;
+        }
+    }
+    if (full)
+        return -1;
+
+    /* trigger the inter-core interrupt */
+    icc_set_sgi(dest_core, ICC_SGI);
+
+    return 0;
 }
