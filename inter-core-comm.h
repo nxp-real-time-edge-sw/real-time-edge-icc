@@ -44,6 +44,10 @@ extern int shd_memfd;
 #define CONFIG_SYS_DDR_SDRAM_BASE       0x60000000UL
 #define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (32UL * 1024 * 1024)
 #define CONFIG_SYS_DDR_SDRAM_SLAVE_RESERVE_SIZE (32UL * 1024 * 1024)
+#elif defined (CONFIG_ICC_IMX93)
+#define CONFIG_SYS_DDR_SDRAM_BASE       0xb0000000UL
+#define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (32UL * 1024 * 1024)
+#define CONFIG_SYS_DDR_SDRAM_SLAVE_RESERVE_SIZE (32UL * 1024 * 1024)
 #else
 #define CONFIG_SYS_DDR_SDRAM_BASE       0x80000000UL
 #define CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE        (256UL * 1024 * 1024)
@@ -52,7 +56,7 @@ extern int shd_memfd;
 
 #define CONFIG_MASTER_CORE                     0
 
-#ifdef CONFIG_ICC_IMX8M
+#if defined (CONFIG_ICC_IMX8M) || defined (CONFIG_ICC_IMX93)
 #define CONFIG_SYS_DDR_SDRAM_SHARE_BASE \
 	(CONFIG_SYS_DDR_SDRAM_BASE  \
 	+ CONFIG_SYS_DDR_SDRAM_SLAVE_SIZE * (CONFIG_MAX_CPUS - 1))
@@ -70,7 +74,7 @@ extern int shd_memfd;
 #elif  defined (CONFIG_ICC_LX2160A)
 #define CONFIG_SYS_DDR_SDRAM_SHARE_SIZE \
 	((64UL * 1024 * 1024) - CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE)
-#elif  defined (CONFIG_ICC_IMX8M)
+#elif  defined (CONFIG_ICC_IMX8M) || defined (CONFIG_ICC_IMX93)
 #define CONFIG_SYS_DDR_SDRAM_SHARE_SIZE \
 	(CONFIG_SYS_DDR_SDRAM_SLAVE_RESERVE_SIZE - CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE)
 #else
@@ -108,7 +112,7 @@ extern int shd_memfd;
  * 0-7 are used by Linux SMP, the number 8
  * is used by IPIPE.
  */
-#ifdef CONFIG_ICC_IMX8M
+#if defined (CONFIG_ICC_IMX8M) || defined (CONFIG_ICC_IMX93)
 #define ICC_SGI 9
 #else
 #define ICC_SGI 8
