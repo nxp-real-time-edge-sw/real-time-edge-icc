@@ -442,7 +442,7 @@ void icc_show(void)
 {
 	int i;
 
-	printf("all cores: reserved_share_memory_base: 0x%lx; size: %d\n",
+	printf("all cores: reserved_share_memory_base: 0x%lx; size: %lu\n",
 		CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_BASE,
 		CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE);
 	printf("\n");
