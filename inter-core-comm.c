@@ -446,7 +446,7 @@ void icc_show(void)
 		CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_BASE,
 		CONFIG_SYS_DDR_SDRAM_SHARE_RESERVE_SIZE);
 	printf("\n");
-	printf("mycoreid: %d; ICC_SGI: %d; share_memory_size: %d\n",
+	printf("mycoreid: %d; ICC_SGI: %d; share_memory_size: %lu\n",
 		mycoreid, ICC_SGI, ICC_CORE_MEM_SPACE);
 	printf("block_unit_size: %lu; block number: %lu; block_idx: %d\n",
 		ICC_BLOCK_UNIT_SIZE, ICC_CORE_BLOCK_COUNT, block_idx);
